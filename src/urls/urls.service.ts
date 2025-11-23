@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUrlDto } from './dto/create-url.dto';
 import { UpdateUrlDto } from './dto/update-url.dto';
 import { PrismaService } from '../prisma.service';
@@ -10,6 +10,7 @@ export class UrlsService {
 
   constructor(private prisma: PrismaService) { }
 
+  // Crear entrada de URL junto con código corto
   async create(createUrlDto: CreateUrlDto) {
     const { originalUrl } = createUrlDto;
 
@@ -39,6 +40,26 @@ export class UrlsService {
     }
 
     throw new InternalServerErrorException('No se pudo generar un código único');
+  }
+
+  // Devuelve el URL según su codigo corto
+  async getUrlByCode(code: string) {
+    const url = await this.prisma.url.findUnique({
+      where: {
+        shortCode: code,
+      },
+    });
+
+    if (!url) {
+      throw new NotFoundException('URL no encontrada');
+    }
+
+    this.prisma.url.update({
+      where: { id: url.id },
+      data: { clicks: { increment: 1 } },
+    }).catch(err => console.error('Error actualizando clicks', err));
+
+    return url;
   }
 
   findAll() {

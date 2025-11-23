@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
 import { UrlsService } from './urls.service';
 import { CreateUrlDto } from './dto/create-url.dto';
+import type { Response } from 'express';
 
 @Controller('urls')
 export class UrlsController {
@@ -16,8 +17,18 @@ export class UrlsController {
     return this.urlsService.findAll();
   }
 
-  @Get(':id')
+  @Get('view/:id')
   findOne(@Param('id') id: string) {
     return this.urlsService.findOne(+id);
+  }
+
+  @Get(':code') 
+  async redirect(
+    @Param('code') code: string, 
+    @Res() res: Response
+  ) {
+    const url = await this.urlsService.getUrlByCode(code);
+
+    return res.redirect(url.originalUrl);
   }
 }
