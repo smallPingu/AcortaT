@@ -22,6 +22,11 @@ export class UrlsController {
     return this.urlsService.findOne(+id);
   }
 
+  @Get(':code/stats')
+  async getUrlStats(@Param('code') code: string) {
+    return this.urlsService.getUrlStats(code);
+  }
+
   @Get(':code') 
   async redirect(
     @Param('code') code: string, 

@@ -42,6 +42,19 @@ export class UrlsService {
     throw new InternalServerErrorException('No se pudo generar un código único');
   }
 
+  // Devuelve URL según su código, pero sin añadir un click
+  async getUrlStats(code: string) {
+    const url = await this.prisma.url.findUnique({
+      where: { shortCode: code },
+    });
+
+    if (!url) {
+      throw new NotFoundException('URL no encontrada');
+    }
+
+    return url; 
+  }
+
   // Devuelve el URL según su codigo corto
   async getUrlByCode(code: string) {
     const url = await this.prisma.url.findUnique({
