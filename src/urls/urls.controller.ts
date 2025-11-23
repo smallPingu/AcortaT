@@ -3,14 +3,9 @@ import { UrlsService } from './urls.service';
 import { CreateUrlDto } from './dto/create-url.dto';
 import type { Response } from 'express';
 
-@Controller('urls')
+@Controller()
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
-
-  @Post() 
-  create(@Body() createUrlDto: CreateUrlDto) {
-    return this.urlsService.create(createUrlDto);
-  }
 
   @Get()
   findAll() {
@@ -22,10 +17,15 @@ export class UrlsController {
     return this.urlsService.findOne(+id);
   }
 
+  @Post() 
+  create(@Body() createUrlDto: CreateUrlDto) {
+    return this.urlsService.create(createUrlDto);
+  }
+
   @Get(':code/stats')
   async getUrlStats(@Param('code') code: string) {
     return this.urlsService.getUrlStats(code);
-  }
+  }  
 
   @Get(':code') 
   async redirect(
