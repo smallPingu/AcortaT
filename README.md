@@ -22,7 +22,7 @@ Prisma ORM
 SQL Manual
 
 
-Autenticación con JWT
+Throttler (evitar spam/DDOS)
 
 
 Arquitectura limpia y escalable
