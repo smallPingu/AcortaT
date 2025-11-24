@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import { AppModule } from './../src/app.module'; // Importar AppModule es más real
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -16,10 +15,17 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
+  it('/ (GET) - Should return list of URLs', async () => {
+    const response = await request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .expect(200);
+
+    expect(Array.isArray(response.body)).toBe(true);
+  });
+  
+  it('/fake-code/stats (GET) - Should return 404', () => {
+    return request(app.getHttpServer())
+      .get('/codigo-inventado-123/stats')
+      .expect(404);
   });
 });

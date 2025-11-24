@@ -76,7 +76,7 @@ export class UrlsService {
   }
 
   findAll() {
-    return `This action returns all urls`;
+    return this.prisma.url.findMany();
   }
 
   findOne(id: number) {
