@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+# ¿Cuándo se ejecuta?
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Solo dura lo que dura el test
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: acortat_test
+        ports:
+          - 5432:5432
+        # Healthcheck para esperar a que la BD arranque antes de seguir
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    # Descargar código
+    - uses: actions/checkout@v3
+
+    # Instalar Node.js
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    # Instalar dependencias
+    - name: Install Dependencies
+      run: npm ci
+
+    # Generar el cliente de Prisma
+    - name: Generate Prisma Client
+      run: npx prisma generate
+
+    # Sincronizar la BD temporal con tu Schema
+    - name: Push Schema to DB
+      run: npx prisma db push
+      env:
+        # Conectamos a la BD temporal de arriba
+        DATABASE_URL: postgres://myuser:mypassword@localhost:5432/acortat_test
+
+    # Ejecutar los Tests E2E
+    - name: Run E2E Tests
+      run: npm run test:e2e
+      env:
+        DATABASE_URL: postgres://myuser:mypassword@localhost:5432/acortat_test
