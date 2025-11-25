@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res, NotFoundException } from '@nestjs/common';
 import { UrlsService } from './urls.service';
 import { CreateUrlDto } from './dto/create-url.dto';
 import type { Response } from 'express';
@@ -7,7 +7,7 @@ import type { Response } from 'express';
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
-  @Get()
+  @Get('list')
   findAll() {
     return this.urlsService.findAll();
   }
@@ -32,8 +32,11 @@ export class UrlsController {
     @Param('code') code: string, 
     @Res() res: Response
   ) {
-    const url = await this.urlsService.getUrlByCode(code);
+    if (code.includes('.')) {
+      throw new NotFoundException(); 
+    }
 
+    const url = await this.urlsService.getUrlByCode(code);
     return res.redirect(url.originalUrl);
   }
 }

@@ -1,10 +1,17 @@
 import { Module } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { UrlsModule } from './urls/urls.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'client'),
+      serveRoot: '/',
+    }),
     UrlsModule, 
     // 60 seg, 10 limite de peticiones
     ThrottlerModule.forRoot([{
@@ -13,7 +20,8 @@ import { UrlsModule } from './urls/urls.module';
     }]),
   ],
   controllers: [],
-  providers: [    
+  providers: [
+    PrismaService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
