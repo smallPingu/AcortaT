@@ -8,16 +8,18 @@ import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'client'),
+      serveRoot: '/',
+    }),
     UrlsModule, 
     // 60 seg, 10 limite de peticiones
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,
     }]),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client'),
-    }),
   ],
+  controllers: [],
   providers: [
     PrismaService,
     {

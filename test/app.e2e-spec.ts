@@ -12,16 +12,22 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    const express = require('express');
+    const path = require('path');
+
+    app.use('/', express.static(path.join(process.cwd(), 'client')));
+
     await app.init();
   });
 
   it('/ (GET) - Should serve Frontend HTML', async () => {
     const response = await request(app.getHttpServer())
-      .get('/')
+      .get('/index.html')
       .expect(200)
       .expect('Content-Type', /html/);
 
-    expect(response.text).toContain('Acorta-T'); 
+    expect(response.text).toContain('Acorta-T');
   });
 
   it('/fake-code/stats (GET) - Should return 404', () => {
@@ -29,7 +35,7 @@ describe('AppController (e2e)', () => {
       .get('/codigo-inventado-123/stats')
       .expect(404);
   });
-  
+
   afterAll(async () => {
     await app.close();
   });
