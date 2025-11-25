@@ -7,7 +7,7 @@ import type { Response } from 'express';
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
-  @Get()
+  @Get('list')
   findAll() {
     return this.urlsService.findAll();
   }
